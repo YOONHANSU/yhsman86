@@ -6,8 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: miyoocft/miyoo-toolchain:v3.1.0
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
@@ -15,14 +13,20 @@ jobs:
         repository: 'aleksei74/FBNeo'
         ref: 'master'
 
+    - name: Install Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git crossbuild-essential-armhf
+
     - name: Compile Custom FBNeo Core
       run: |
         cd ${{ github.workspace }}
         
+        # 우분투 리눅스 표준 크로스 컴파일러를 Makefile.libretro에 강제 주입
         make -f Makefile.libretro platform=miyoo \
-          CC=/opt/miyoo/usr/bin/arm-linux-gcc \
-          CXX=/opt/miyoo/usr/bin/arm-linux-g++ \
-          AR=/opt/miyoo/usr/bin/arm-linux-ar \
+          CC=arm-linux-gnueabihf-gcc \
+          CXX=arm-linux-gnueabihf-g++ \
+          AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard" \
