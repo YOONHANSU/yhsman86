@@ -1,0 +1,40 @@
+name: Build FBNeo MMP Real Final Core
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Official Source Code
+      uses: actions/checkout@v4
+      with:
+        repository: 'finalburnneo/FBNeo' # 오리지널 공식 최신 소스코드를 다운로드
+        ref: 'master'
+
+    - name: Install Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git crossbuild-essential-armhf
+
+    - name: Compile Custom FBNeo Core
+      run: |
+        # 공식 소스 내부의 정확한 리트로아치 빌드 폴더로 진입
+        cd src/burn/libretro
+        
+        # 미유미니 플러스 하드웨어 규격(Cortex-A7, NEON 가속, Hard-Float) 주입 빌드
+        make -f Makefile.libretro platform=miyoo \
+          CC=arm-linux-gnueabihf-gcc \
+          CXX=arm-linux-gnueabihf-g++ \
+          AR=arm-linux-gnueabihf-ar \
+          WANT_NEOGEO=1 \
+          HAVE_NEON=1 \
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
+
+    - name: Upload Finished Core (.so)
+      uses: actions/upload-artifact@v4
+      with:
+        name: fbneo_libretro_miyoo
+        path: src/burn/libretro/fbneo_libretro.so
