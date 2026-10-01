@@ -21,16 +21,14 @@ jobs:
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burn/libretro
-        # 미유미니에 맞춘 수동 크로스 컴파일 및 하드웨어 가속 강제 주입
-        make -f Makefile.libretro platform=unix \
+        # 미유미니 하드웨어와 일치하는 정밀 ARMv7 하드플로트 플랫폼 지정 빌드
+        make -f Makefile.libretro platform=armv7neonhardfloat \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
-          SHARED="-shared -Wl,--version-script=link.options -Wl,--no-undefined" \
           WANT_NEOGEO=1 \
-          HAVE_NEON=1 \
-          CFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer" \
-          CXXFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer"
+          CFLAGS="-O3 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer" \
+          CXXFLAGS="-O3 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
