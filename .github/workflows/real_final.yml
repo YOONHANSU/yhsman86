@@ -42,12 +42,27 @@ jobs:
           echo "=== 무적의 껍데기 세척 완료 ==="
         fi
 
+    - name: Slim Down Makefile Includes
+      run: |
+        cd src/burner/libretro
+        # 명령줄 길이 한계를 폭발시키던 대형 드라이버 경로 파라미터 수십 개를 빌드 실행 파일(Makefile)에서 물리적으로 전면 삭제 처리
+        # 오직 세이부 축구와 메인 코어 엔진 연산에 꼭 필요한 경로만 남겨 명령어 버퍼 터짐을 원천 봉쇄합니다.
+        sed -i 's/-I$(BURN_DIR)\/drv\/capcom//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/konami//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/dataeast//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/cave//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/psikyo//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/sega//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/toaplan//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/taito//g' Makefile
+        sed -i 's/-I$(BURN_DIR)\/drv\/irem//g' Makefile
+        echo "=== 메이크파일 수천 바이트 문자열 다이어트 성공 ==="
+
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burner/libretro
         
-        # 가상 머신 메모리를 터뜨리던 무거운 대형 드라이버셋을 통째로 오프(0)하여 링킹 명령줄 글자 수 대폭 압축
-        # 오직 세이부 축구가 포함된 메인 아케이드 엔진 코어만 극도로 가볍고 빠르게 빌드
+        # 불필요한 빌드 리스트를 완전히 정리하고 최종 컴파일 링킹 단행
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
