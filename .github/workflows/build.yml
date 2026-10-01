@@ -18,17 +18,21 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential git crossbuild-essential-armhf
 
-    - name: Compile Custom FBNeo Core
+    - name: Direct Compile FBNeo Core
       run: |
         cd src/burn/libretro
-        # 미유미니 하드웨어와 일치하는 정밀 ARMv7 하드플로트 플랫폼 지정 빌드
-        make -f Makefile.libretro platform=armv7neonhardfloat \
-          CC=arm-linux-gnueabihf-gcc \
-          CXX=arm-linux-gnueabihf-g++ \
-          AR=arm-linux-gnueabihf-ar \
+        # 내장 Makefile의 방해를 방지하기 위해 UNIX 기본형 기반으로 빌드 틀을 고정
+        # 미유미니 플러스 사양(Cortex-A7, NEON 가속, Hard-Float)을 다이렉트로 주입
+        make -f Makefile.libretro platform=unix \
+          CC="arm-linux-gnueabihf-gcc" \
+          CXX="arm-linux-gnueabihf-g++" \
+          AR="arm-linux-gnueabihf-ar" \
+          fpic="-fPIC" \
+          HAVE_NEON=1 \
           WANT_NEOGEO=1 \
-          CFLAGS="-O3 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer" \
-          CXXFLAGS="-O3 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer"
+          EXTRA_INCLUDES="" \
+          CFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -fPIC -fno-stack-protector" \
+          CXXFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -fPIC -fno-stack-protector"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
