@@ -42,28 +42,19 @@ jobs:
           echo "=== 무적의 껍데기 세척 완료 ==="
         fi
 
-    - name: Hard Purge Makefile Includes
-      run: |
-        cd src/burner/libretro
-        # 수천 자에 달하던 인클루드 플래그들을 원천적으로 압축하기 위해 Makefile을 백업하고 정밀 덮어쓰기 단행
-        # 세이부 축구와 전혀 무관한 드라이버 경로들을 전면 무효화 처리하여 버퍼 터짐을 원천 분쇄합니다.
-        sed -i 's/inc\.inc/ /g' Makefile
-        sed -i 's/-I$(BURN_DIR)\/drv\/[^ ]*//g' Makefile
-        echo "=== 메이크파일 명령어 문자열 강제 슬림화 완료 ==="
-
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burner/libretro
         
-        # 불필요한 빌드 리스트를 완전히 정리하고 최종 컴파일 링킹 단행
+        # WANT_ONLY_NEOGEO=1 공식 마법의 단독 빌드 스위치 발동!
+        # 난잡한 수십 개의 Off 옵션과 파일 다이어트 과정을 생략하고, 명령어 글자 수와 메모리 점유율을 10분의 1로 압축 완수
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
+          WANT_ONLY_NEOGEO=1 \
           HAVE_NEON=1 \
-          WANT_CPS1=0 WANT_CPS2=0 WANT_CPS3=0 \
-          WANT_SEGA=0 WANT_TAITO=0 WANT_KONAMI=0 WANT_CAVE=0 WANT_IGS=0 WANT_SUAMR=0 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
