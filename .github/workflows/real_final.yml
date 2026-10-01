@@ -20,37 +20,35 @@ jobs:
 
     - name: Patch CHD Source Code
       run: |
-        # 세이부 축구와 무관하지만 빌드를 방해하는 cd_img.inc 내부의 CHD 에러 유발 함수들을 빈 껍데기로 강제 리팩토링
         TARGET_FILE="src/intf/cd/cd_img.inc"
         
         if [ -f "$TARGET_FILE" ]; then
-          echo "=== CHD 에러 소스 코드 강제 패치 시작 ==="
+          echo "=== CHD 에러 함수 몸통 강제 제거 시작 ==="
           
-          # ChdReadSector 호출부 에러 우회용 더미 리턴 처리
-          sed -i 's/if (ChdReadSector(pImage->pChd, nLba, nType, pDest))/if (0)/g' $TARGET_FILE
+          # 1. 에러가 집중적으로 터지는 CDImageReadSector 함수의 시작 지점부터 내부 내용을 통째로 날리고 빈 더미 함수로 리팩토링
+          # 함수 호출 시 무조건 실패 처리(return 1)하도록 소스코드를 안전하게 밀어버립니다.
+          sed -i '/INT32 CDImageReadSector(CDImage\* pImage, INT32 nLba, UINT8\* pDest, INT32 nType)/,/^}/c\INT32 CDImageReadSector(CDImage* pImage, INT32 nLba, UINT8* pDest, INT32 nType) { return 1; }' $TARGET_FILE
           
-          # CDImageGetChdSha1 함수 에러 우회
-          sed -i 's/return pImage \&\& pImage->pChd ? ChdGetSha1(pImage->pChd, pSha1) : 1;/return 1;/g' $TARGET_FILE
+          # 2. SHA1 체크 함수 역시 본문 내용을 지우고 단순 실패 리턴 처리
+          sed -i '/INT32 CDImageGetChdSha1(const CDImage\* pImage, UINT8\* pSha1)/,/^}/c\INT32 CDImageGetChdSha1(const CDImage* pImage, UINT8* pSha1) { return 1; }' $TARGET_FILE
           
-          # cdimgExit 내부의 ChdClose 호출부 우회
+          # 3. 오디오 트랙 카운트 함수 본문 삭제 및 리턴 처리
+          sed -i '/INT32 cdimgCountChdAudioTracks(TCHAR\* pszPath)/,/^}/c\INT32 cdimgCountChdAudioTracks(TCHAR* pszPath) { return 0; }' $TARGET_FILE
+          
+          # 4. 구조체 부재 오류 원천 차단용 포인터 변환
+          sed -i 's/static ChdImage\* cdimgChd/static void\* cdimgChd/g' $TARGET_FILE
           sed -i 's/ChdClose(cdimgChd);/\/\/ ChdClose(cdimgChd);/g' $TARGET_FILE
           
-          # cdimgCountChdAudioTracks 함수 내부 우회
-          sed -i 's/return ChdCountAudioTracks(pszPath);/return 0;/g' $TARGET_FILE
-          
-          # ChdImage 구조체 정의 부재 에러 방지를 위해 void* 형태로 강제 치환
-          sed -i 's/static ChdImage\* cdimgChd/static void\* cdimgChd/g' $TARGET_FILE
-          
-          echo "=== 패치 완료 ==="
+          echo "=== 소스코드 세척 및 더미화 완료 ==="
         else
-          echo "패치할 파일을 찾을 수 없습니다. 경로를 확인하세요."
+          echo "패치 대상 파일을 찾지 못했습니다."
         fi
 
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burner/libretro
         
-        # 소스 코드가 세척되었으므로 안심하고 미유미니 규격으로 최종 링킹 단행
+        # 골칫덩어리 소스코드가 완벽히 세척되었으므로 안심하고 최종 컴파일 집행
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
