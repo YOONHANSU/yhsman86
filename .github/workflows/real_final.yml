@@ -20,19 +20,17 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        # 완벽하게 확인된 진짜 물리적 경로로 이동
         cd src/burner/libretro
         
-        # 확장자 없는 순수 대문자 Makefile을 정확히 호출하여 미유미니 규격 컴파일 집행
-        # (힌트 로그 분석 결과에 맞춰 최적의 플랫폼 아키텍처 옵션 강제 주입)
+        # -Wno-write-strings 및 최적화 플래그를 추가하여 C++ 문자열 표준 에러를 완벽 우회
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard" \
-          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
