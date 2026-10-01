@@ -20,8 +20,11 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        # 폴더 이동 없이 소스 최상단 루트 공간에서 makefile.libretro를 즉시 실행
-        make -f makefile.libretro platform=miyoo \
+        # 공식 소스 내부의 정확한 리트로아치 빌드 폴더(src/burner/libretro)로 명확히 이동
+        cd src/burner/libretro
+        
+        # 대문자 Makefile.libretro를 정확히 호출하여 미유미니 규격으로 컴파일 강제 집행
+        make -f Makefile.libretro platform=miyoo \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
@@ -31,7 +34,7 @@ jobs:
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
 
     - name: Upload Finished Core (.so)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact=v4
       with:
         name: fbneo_libretro_miyoo
-        path: fbneo_libretro.so
+        path: src/burner/libretro/fbneo_libretro.so
