@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: miyoocft/miyoo-toolchain:v3.1.0 # 미유미니 공식 SDK 빌드 환경 도커 이식
+      image: miyoocft/miyoo-toolchain:v3.1.0 # 미유미니 공식 SDK 가상 환경
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
@@ -17,8 +17,7 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        cd src/burn/libretro
-        # 미유미니 공식 환경 내부의 크로스 컴파일러 경로 지정 및 최적화
+        # 최상단 폴더에서 바로 미유미니 공식 크로스 컴파일 시작
         make -f Makefile.libretro platform=miyoo \
           CC=/opt/miyoo/usr/bin/arm-linux-gcc \
           CXX=/opt/miyoo/usr/bin/arm-linux-g++ \
@@ -32,4 +31,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fbneo_libretro_miyoo
-        path: src/burn/libretro/fbneo_libretro.so
+        path: fbneo_libretro.so
