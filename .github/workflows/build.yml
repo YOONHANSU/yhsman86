@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: miyoocft/miyoo-toolchain:v3.1.0 # 미유미니 공식 SDK 빌드 환경 도커 이식
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
@@ -13,26 +15,18 @@ jobs:
         repository: 'aleksei74/FBNeo'
         ref: 'master'
 
-    - name: Install Toolchain
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential git crossbuild-essential-armhf
-
-    - name: Direct Compile FBNeo Core
+    - name: Compile Custom FBNeo Core
       run: |
         cd src/burn/libretro
-        # 내장 Makefile의 방해를 방지하기 위해 UNIX 기본형 기반으로 빌드 틀을 고정
-        # 미유미니 플러스 사양(Cortex-A7, NEON 가속, Hard-Float)을 다이렉트로 주입
-        make -f Makefile.libretro platform=unix \
-          CC="arm-linux-gnueabihf-gcc" \
-          CXX="arm-linux-gnueabihf-g++" \
-          AR="arm-linux-gnueabihf-ar" \
-          fpic="-fPIC" \
-          HAVE_NEON=1 \
+        # 미유미니 공식 환경 내부의 크로스 컴파일러 경로 지정 및 최적화
+        make -f Makefile.libretro platform=miyoo \
+          CC=/opt/miyoo/usr/bin/arm-linux-gcc \
+          CXX=/opt/miyoo/usr/bin/arm-linux-g++ \
+          AR=/opt/miyoo/usr/bin/arm-linux-ar \
           WANT_NEOGEO=1 \
-          EXTRA_INCLUDES="" \
-          CFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -fPIC -fno-stack-protector" \
-          CXXFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -fPIC -fno-stack-protector"
+          HAVE_NEON=1 \
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
