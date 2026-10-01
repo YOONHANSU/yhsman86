@@ -22,14 +22,16 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # USE_LIBCHDR=1 공식을 주입하여 구조체 멤버 누락 및 ChdReadSector 미선언 오류를 완벽히 정공법으로 해결
+        # 내부 Makefile의 CHD 강제 진입을 차단하기 위해 관련 의존성 스위치(WANT_CHD, HAVE_CHD, USE_LIBCHDR)를 모두 0과 무력화 값으로 고정
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          USE_LIBCHDR=1 \
+          WANT_CHD=0 \
+          HAVE_CHD=0 \
+          USE_LIBCHDR=0 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
