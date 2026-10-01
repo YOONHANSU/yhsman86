@@ -20,10 +20,7 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        # 공식 소스 내부의 정확한 리트로아치 빌드 폴더(src/burn/libretro)로 이동
-        cd src/burn/libretro
-        
-        # 전부 소문자인 makefile.libretro를 정확히 호출하여 미유미니 규격으로 컴파일 강제 집행
+        # 폴더 이동 없이 소스 최상단 루트 공간에서 makefile.libretro를 즉시 실행
         make -f makefile.libretro platform=miyoo \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
@@ -37,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fbneo_libretro_miyoo
-        path: src/burn/libretro/fbneo_libretro.so
+        path: fbneo_libretro.so
