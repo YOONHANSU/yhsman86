@@ -22,15 +22,16 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # -Wno-write-strings 및 최적화 플래그를 추가하여 C++ 문자열 표준 에러를 완벽 우회
+        # -include wchar.h 플래그를 사용하여 wcslen 함수 정의를 강제로 전역 주입
+        # -Dwcslen=_tcslen 매크로를 함께 주입하여 리트로아치 호환성 극대화
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings" \
-          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings"
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -Dwcslen=_tcslen"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
