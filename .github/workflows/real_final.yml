@@ -46,7 +46,8 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # 세이부 축구 전용 슬림화 빌드로 메모리 폭발과 버그 차단
+        # 가상 머신 메모리를 터뜨리던 무거운 대형 드라이버셋을 통째로 오프(0)하여 링킹 명령줄 글자 수 대폭 압축
+        # 오직 세이부 축구가 포함된 메인 아케이드 엔진 코어만 극도로 가볍고 빠르게 빌드
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
@@ -54,7 +55,7 @@ jobs:
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
           WANT_CPS1=0 WANT_CPS2=0 WANT_CPS3=0 \
-          WANT_SEGA=0 WANT_TAITO=0 WANT_KONAMI=0 WANT_CAVE=0 \
+          WANT_SEGA=0 WANT_TAITO=0 WANT_KONAMI=0 WANT_CAVE=0 WANT_IGS=0 WANT_SUAMR=0 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
