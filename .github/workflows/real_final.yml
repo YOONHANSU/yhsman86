@@ -22,13 +22,14 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # -D__LIBRETRO__ 와 -D_GNU_SOURCE 옵션을 주입하여 리눅스 환경에 없는 윈도우 전용 매크로(RECT, TCHARToANSI 등) 오류를 원천 차단
+        # WANT_CHD=0 옵션을 강제 주입하여 세이부 축구와 무관한 CD-ROM 이미지 에러를 완벽히 우회
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
+          WANT_CHD=0 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
