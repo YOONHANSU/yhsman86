@@ -22,8 +22,8 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # -include wchar.h 플래그를 사용하여 wcslen 함수 정의를 강제로 전역 주입
-        # -Dwcslen=_tcslen 매크로를 함께 주입하여 리트로아치 호환성 극대화
+        # 꼬여있던 매크로(-Dwcslen)를 과감히 제거
+        # C++ 와이드 문자 처리 헤더인 cwchar를 컴파일러 단에서 소스 최상단에 전역 강제 주입(-include cwchar)
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
@@ -31,7 +31,7 @@ jobs:
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h" \
-          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -Dwcslen=_tcslen"
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
