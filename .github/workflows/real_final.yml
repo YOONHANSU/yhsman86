@@ -13,10 +13,29 @@ jobs:
         repository: 'aleksei74/FBNeo'
         ref: 'master'
 
-    - name: Find Makefile Location
+    - name: Install Toolchain
       run: |
-        echo "=== [1] 저장소 최상단 파일 목록 ==="
-        ls -la
+        sudo apt-get update
+        sudo apt-get install -y build-essential git crossbuild-essential-armhf
+
+    - name: Compile Custom FBNeo Core
+      run: |
+        # 완벽하게 확인된 진짜 물리적 경로로 이동
+        cd src/burner/libretro
         
-        echo "=== [2] 전체 폴더 안에서 libretro 메이크파일 검색 ==="
-        find . -iname "*makefile.libretro*" -o -iname "*makefile*" || echo "찾지 못함"
+        # 확장자 없는 순수 대문자 Makefile을 정확히 호출하여 미유미니 규격 컴파일 집행
+        # (힌트 로그 분석 결과에 맞춰 최적의 플랫폼 아키텍처 옵션 강제 주입)
+        make -f Makefile platform=classic_armv7-a \
+          CC=arm-linux-gnueabihf-gcc \
+          CXX=arm-linux-gnueabihf-g++ \
+          AR=arm-linux-gnueabihf-ar \
+          WANT_NEOGEO=1 \
+          HAVE_NEON=1 \
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard"
+
+    - name: Upload Finished Core (.so)
+      uses: actions/upload-artifact@v4
+      with:
+        name: fbneo_libretro_miyoo
+        path: src/burner/libretro/fbneo_libretro.so
