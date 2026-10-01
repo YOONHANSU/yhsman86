@@ -22,14 +22,14 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # WANT_CHD=0 옵션을 강제 주입하여 세이부 축구와 무관한 CD-ROM 이미지 에러를 완벽히 우회
+        # DISABLE_CHD=1 플래그를 정밀 주입하여 에러가 터지던 retro_cdemu 단계를 완벽히 무력화하고 스킵
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          WANT_CHD=0 \
+          DISABLE_CHD=1 \
           CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
           CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
