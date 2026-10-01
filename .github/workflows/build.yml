@@ -1,0 +1,38 @@
+name: Build FBNeo for Miyoo Mini Plus
+
+on:
+  workflow_dispatch: # 사용자가 버튼을 누르면 수동으로 작동하도록 설정
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+      with:
+        repository: 'aleksei74/FBNeo' # 불러올 dsno님의 깃허브 주소
+        ref: 'master'
+
+    - name: Install Compiler Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git crossbuild-essential-armhf
+
+    - name: Compile Custom FBNeo Core
+      run: |
+        cd src/burn/libretro
+        # 미유미니 하드웨어에 맞춘 극한의 컴파일 옵션 세팅
+        make -f Makefile.libretro platform=miyoo \
+          CC=arm-linux-gnueabihf-gcc \
+          CXX=arm-linux-gnueabihf-g++ \
+          HAVE_NEON=1 \
+          EXCLUDE_DRIVERS=1 \
+          INCLUDE_SEIBU=1 \
+          CFLAGS="-O3 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -DOBJS_ONLY" \
+          CXXFLAGS="-O3 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -DOBJS_ONLY"
+
+    - name: Upload Finished Core (.so)
+      uses: actions/upload-artifact@v4
+      with:
+        name: fbneo_libretro_miyoo
+        path: src/burn/libretro/fbneo_libretro.so
