@@ -37,15 +37,16 @@ jobs:
           printf 'UINT8* cdimgReadQChannel() { return NULL; }\n' >> $TARGET_FILE
           printf 'INT32 cdimgGetSoundBuffer(INT16* buffer, INT32 samples) { return 0; }\n' >> $TARGET_FILE
           printf 'INT32 cdimgSetVolume(double dVolume) { return 0; }\n' >> $TARGET_FILE
-          printf 'INT32 cdimgGetCurrentLBA() { return 0; }\n' >> $^^cdimgScan(INT32 nAction, INT32* pnMin) { return 0; }\n' >> $TARGET_FILE
+          printf 'INT32 cdimgGetCurrentLBA() { return 0; }\n' >> $TARGET_FILE
+          printf 'INT32 cdimgScan(INT32 nAction, INT32* pnMin) { return 0; }\n' >> $TARGET_FILE
+          echo "=== 무적의 껍데기 세척 완료 ==="
         fi
 
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burner/libretro
         
-        # 무거운 타사 대형 드라이버(WANT_CPS=0, WANT_SEGA=0 등)를 명시적으로 꺼서 명령줄 길이 폭발과 메모리 부족을 방지
-        # 오직 세이부 축구가 속한 아케이드/네오지오 코어 엔진만 극도로 가볍게 남겨 빌드 완수
+        # 세이부 축구 전용 슬림화 빌드로 메모리 폭발과 버그 차단
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
