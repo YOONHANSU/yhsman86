@@ -22,15 +22,16 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # -D__LIBCHDR__ 매크로를 강제 주입하여 cd_img.inc 내부의 CHD 함수 미선언 오류를 원천 차단하고 관통
+        # USE_LIBCHDR=1 공식을 주입하여 구조체 멤버 누락 및 ChdReadSector 미선언 오류를 완벽히 정공법으로 해결
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE -D__LIBCHDR__" \
-          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE -D__LIBCHDR__"
+          USE_LIBCHDR=1 \
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
