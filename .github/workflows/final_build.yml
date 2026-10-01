@@ -20,8 +20,10 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        # cd 명령어 없이 최상단 폴더에서 Makefile.libretro를 직접 지정하여 즉시 컴파일
-        make -f Makefile.libretro platform=miyoo \
+        cd ${{ github.workspace }}
+        
+        # 파일명을 소문자 makefile.libretro로 정밀 수정하여 컴파일 강제 집행
+        make -f makefile.libretro platform=miyoo \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
@@ -34,4 +36,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fbneo_libretro_miyoo
-        path: fbneo_libretro.so
+        path: ${{ github.workspace }}/fbneo_libretro.so
