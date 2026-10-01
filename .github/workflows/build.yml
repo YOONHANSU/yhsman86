@@ -21,16 +21,16 @@ jobs:
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burn/libretro
-        # 소스코드 고유 플랫폼 규칙을 강제 적용하고 세이부 축구 전용 최적화 컴파일 진행
-        make -f Makefile.libretro platform=miyoo \
+        # 미유미니에 맞춘 수동 크로스 컴파일 및 하드웨어 가속 강제 주입
+        make -f Makefile.libretro platform=unix \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
+          SHARED="-shared -Wl,--version-script=link.options -Wl,--no-undefined" \
+          WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          EXCLUDE_DRIVERS=1 \
-          INCLUDE_SEIBU=1 \
-          EXTRA_CFLAGS="-O3 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -DOBJS_ONLY" \
-          EXTRA_CXXFLAGS="-O3 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer -DOBJS_ONLY"
+          CFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer" \
+          CXXFLAGS="-O3 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fomit-frame-pointer"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
