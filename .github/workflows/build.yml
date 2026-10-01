@@ -1,7 +1,7 @@
 name: Build FBNeo for Miyoo Mini Plus
 
 on:
-  workflow_dispatch: # 사용자가 버튼을 누르면 수동으로 작동하도록 설정
+  workflow_dispatch: # 수동 가동 버튼 활성화
 
 jobs:
   build:
@@ -10,7 +10,7 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v4
       with:
-        repository: 'aleksei74/FBNeo' # 불러올 dsno님의 깃허브 주소
+        repository: 'aleksei74/FBNeo'
         ref: 'master'
 
     - name: Install Compiler Toolchain
@@ -21,10 +21,11 @@ jobs:
     - name: Compile Custom FBNeo Core
       run: |
         cd src/burn/libretro
-        # 미유미니 하드웨어에 맞춘 극한의 컴파일 옵션 세팅
-        make -f Makefile.libretro platform=miyoo \
+        # 미유미니 컴파일러 수동 강제 매핑 및 세이부 축구 전용 슬림 빌드
+        make -f Makefile.libretro platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
+          AR=arm-linux-gnueabihf-ar \
           HAVE_NEON=1 \
           EXCLUDE_DRIVERS=1 \
           INCLUDE_SEIBU=1 \
