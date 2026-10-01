@@ -22,16 +22,15 @@ jobs:
       run: |
         cd src/burner/libretro
         
-        # 꼬여있던 매크로(-Dwcslen)를 과감히 제거
-        # C++ 와이드 문자 처리 헤더인 cwchar를 컴파일러 단에서 소스 최상단에 전역 강제 주입(-include cwchar)
+        # -D__LIBRETRO__ 와 -D_GNU_SOURCE 옵션을 주입하여 리눅스 환경에 없는 윈도우 전용 매크로(RECT, TCHARToANSI 등) 오류를 원천 차단
         make -f Makefile platform=classic_armv7-a \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
           WANT_NEOGEO=1 \
           HAVE_NEON=1 \
-          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h" \
-          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar"
+          CFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include wchar.h -D__LIBRETRO__ -D_GNU_SOURCE" \
+          CXXFLAGS="-O3 -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -Wno-write-strings -include cwchar -D__LIBRETRO__ -D_GNU_SOURCE"
 
     - name: Upload Finished Core (.so)
       uses: actions/upload-artifact@v4
