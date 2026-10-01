@@ -17,7 +17,6 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        # 깃허브가 코드를 내려받은 절대 경로로 강제 이동 후 컴파일 실행
         cd ${{ github.workspace }}
         
         make -f Makefile.libretro platform=miyoo \
