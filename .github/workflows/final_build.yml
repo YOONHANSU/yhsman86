@@ -7,10 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Source Code
+    - name: Checkout Official Source Code
       uses: actions/checkout@v4
       with:
-        repository: 'aleksei74/FBNeo'
+        repository: 'finalburnneo/FBNeo' # 공식 최신 FBNeo 소스코드를 통째로 다운로드
         ref: 'master'
 
     - name: Install Toolchain
@@ -20,10 +20,11 @@ jobs:
 
     - name: Compile Custom FBNeo Core
       run: |
-        cd ${{ github.workspace }}
+        # 실제 소스 파일이 존재하는 내부 폴더로 완벽하게 진입
+        cd src/burn/libretro
         
-        # 파일명을 소문자 makefile.libretro로 정밀 수정하여 컴파일 강제 집행
-        make -f makefile.libretro platform=miyoo \
+        # 미유미니 플러스 사양(Cortex-A7, NEON 가속) 강제 주입 빌드
+        make -f Makefile.libretro platform=miyoo \
           CC=arm-linux-gnueabihf-gcc \
           CXX=arm-linux-gnueabihf-g++ \
           AR=arm-linux-gnueabihf-ar \
@@ -36,4 +37,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fbneo_libretro_miyoo
-        path: ${{ github.workspace }}/fbneo_libretro.so
+        path: src/burn/libretro/fbneo_libretro.so
