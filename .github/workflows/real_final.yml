@@ -25,17 +25,15 @@ jobs:
         if [ -f "$TARGET_FILE" ]; then
           echo "=== 에러 유발 소스 내용물 전면 삭제 및 더미화 시작 ==="
           
-          # 파일 내용을 통째로 초기화하고 리트로아치 빌드에 꼭 필요한 빈 함수 껍데기만 주입
-          cat << 'EOF' > $TARGET_FILE
-          #include <string.h>
-          static void* cdimgChd = NULL;
-          INT32 cdimgInit() { return 1; }
-          INT32 cdimgExit() { return 0; }
-          INT32 CDImageReadSector(void* pImage, INT32 nLba, UINT8* pDest, INT32 nType) { return 1; }
-          INT32 CDImageReadUserSector(void* pImage, INT32 nLba, UINT8* pDest, INT32* nType) { return 1; }
-          INT32 CDImageGetChdSha1(const void* pImage, UINT8* pSha1) { return 1; }
-          INT32 cdimgCountChdAudioTracks(TCHAR* pszPath) { return 0; }
-          EOF
+          # 안전한 printf 방식으로 공백 버그 없이 빈 껍데기 함수 강제 주입
+          printf '#include <string.h>\n' > $TARGET_FILE
+          printf 'static void* cdimgChd = NULL;\n' >> $TARGET_FILE
+          printf 'INT32 cdimgInit() { return 1; }\n' >> $TARGET_FILE
+          printf 'INT32 cdimgExit() { return 0; }\n' >> $TARGET_FILE
+          printf 'INT32 CDImageReadSector(void* pImage, INT32 nLba, UINT8* pDest, INT32 nType) { return 1; }\n' >> $TARGET_FILE
+          printf 'INT32 CDImageReadUserSector(void* pImage, INT32 nLba, UINT8* pDest, INT32* nType) { return 1; }\n' >> $TARGET_FILE
+          printf 'INT32 CDImageGetChdSha1(const void* pImage, UINT8* pSha1) { return 1; }\n' >> $TARGET_FILE
+          printf 'INT32 cdimgCountChdAudioTracks(void* pszPath) { return 0; }\n' >> $TARGET_FILE
           
           echo "=== 무적의 껍데기 세척 완료 ==="
         else
